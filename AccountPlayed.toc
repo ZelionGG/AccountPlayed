@@ -1,5 +1,5 @@
 ## Interface: 110207, 120000, 120001
-## Version: 1.0.0
+## Version: 1.0.2
 ## Title: Account Played
 ## Notes: get account /played and sort by class
 ## Author: Jeremy-Gstein
