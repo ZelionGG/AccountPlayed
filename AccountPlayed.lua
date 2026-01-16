@@ -71,7 +71,7 @@ local function GetClassTotals()
             totals[data.class] = (totals[data.class] or 0) + data.time
             accountTotal = accountTotal + data.time
         elseif type(data) == "number" then
-            totals["IDK"] = (totals["IDK"] or 0) + data
+            totals["CLASSNAME"] = (totals["CLASSNAME"] or 0) + data
             accountTotal = accountTotal + data
         end
     end
@@ -89,10 +89,10 @@ local function DebugListCharacters()
         local time, class
         if type(data) == "table" then
             time = data.time or 0
-            class = data.class or "IDK"
+            class = data.class or "CLASSNAME"
         else
             time = data
-            class = "IDK"
+            class = "CLASSNAME"
         end
         print(string.format(" |cffffff00 - %s : %s (%s)|r", charKey, FormatTime(time), class))
     end
