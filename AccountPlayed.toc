@@ -3,7 +3,7 @@
 ## Title: Account Played
 ## Notes: get account /played and sort by class
 ## Author: Jeremy-Gstein
-## SavedVariables: AccountPlayedDB, AccountPlayedMinimapDB 
+## SavedVariables: AccountPlayedDB, AccountPlayedMinimapDB, AccountPlayedPopupDB
 
 ## X-License: Licensed under the MIT License. See the LICENSE file in the project root for details.
 ## X-Website: https://github.com/Jeremy-Gstein/AccountPlayed
