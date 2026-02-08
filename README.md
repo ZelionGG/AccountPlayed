@@ -5,7 +5,6 @@ Simple WoW addon to track and display /played time. sorting by class across all 
 
 <img width="791" height="339" alt="image" src="https://github.com/user-attachments/assets/dda71859-7138-45f5-91b9-e8bc22eaa8cc" />
 
-
 Features:
 - View your accounts top played time by class
 - sorted by (class/total account /played) as a percentage
