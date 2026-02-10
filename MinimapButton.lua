@@ -3,6 +3,7 @@
 --   - Snaps to minimap edge when close (works with round minimap)
 --   - Breaks free for arbitrary positioning (works with square minimap / ElvUI)
 --   - Saves x,y offset relative to Minimap center between sessions
+--   - Fade button to hidden when not moused over minimap
 
 -- Addon namespace
 AccountPlayed = AccountPlayed or {}
@@ -71,6 +72,24 @@ local function UpdateDragPosition(self)
     UpdateButtonPosition(self)
 end
 
+-- Fade animation helper
+local function FadeButton(btn, targetAlpha, duration)
+    local startAlpha = btn:GetAlpha()
+    local elapsed = 0
+    duration = duration or 0.15
+    
+    btn.fadeFrame = btn.fadeFrame or CreateFrame("Frame")
+    btn.fadeFrame:SetScript("OnUpdate", function(self, delta)
+        elapsed = elapsed + delta
+        local progress = math.min(1, elapsed / duration)
+        btn:SetAlpha(startAlpha + (targetAlpha - startAlpha) * progress)
+        
+        if progress >= 1 then
+            self:SetScript("OnUpdate", nil)
+        end
+    end)
+end
+
 -- Creation of the Minimap button
 local function CreateMinimapButton()
     -- Don't create if hidden
@@ -93,6 +112,7 @@ local function CreateMinimapButton()
     btn:RegisterForClicks("LeftButtonUp")
     btn:RegisterForDrag("LeftButton")
     btn:SetClampedToScreen(true)
+    btn:SetAlpha(0.2)  -- Start faded out
 
     -- Debugging line to check if the button is created
     --print("Button Created")
@@ -111,6 +131,30 @@ local function CreateMinimapButton()
     btn:SetScript("OnClick", function()
         PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
         SlashCmdList.ACCOUNTPLAYEDPOPUP()
+    end)
+
+    -- Track minimap mouse state for fade in/out (only when snapped)
+    local minimapHoverFrame = CreateFrame("Frame")
+    minimapHoverFrame:SetScript("OnUpdate", function(self)
+        if btn.isDragging then return end  -- Don't fade while dragging
+        
+        -- Only auto-hide if button is snapped to minimap
+        if btn.snapped then
+            if Minimap:IsMouseOver(60, -60, -60, 60) then
+                if btn:GetAlpha() < 1 then
+                    FadeButton(btn, 1, 0.15)
+                end
+            else
+                if btn:GetAlpha() > 0.01 then -- setting alpa to 0 gave state bug so we fake it here.
+                    FadeButton(btn, 0.01, 0.15)
+                end
+            end
+        else
+            -- When not snapped, always show at full opacity
+            if btn:GetAlpha() < 1 then
+                FadeButton(btn, 1, 0.15)
+            end
+        end
     end)
 
     -- Border (OVERLAY, positioned first)
@@ -195,6 +239,28 @@ local function CreateMinimapButton()
     btn.snapped = (savedDist <= edgeRadius + btn:GetWidth() * 0.3)
 
     UpdateButtonPosition(btn)
+end
+
+
+-- Slash command to reset button position
+SLASH_ACCOUNTPLAYEDRESETMAP1 = "/apresetmap"
+SlashCmdList.ACCOUNTPLAYEDRESETMAP = function()
+    -- Reset to default position (bottom-left, 225 degrees)
+    local angle = math.rad(225)
+    local radius = 105
+    AccountPlayedMinimapDB.x = math.cos(angle) * radius
+    AccountPlayedMinimapDB.y = math.sin(angle) * radius
+    
+    -- Update button if it exists
+    local btn = _G[BUTTON_NAME]
+    if btn then
+        btn.snapped = true  -- Reset snap state
+        UpdateButtonPosition(btn)
+        FadeButton(btn, 1, 0.15)  -- Make it visible
+        print("|cff00ff00Account Played:|r Minimap button position reset to default.")
+    else
+        print("|cff00ff00Account Played:|r Minimap button will appear at default position on next login.")
+    end
 end
 
 -- Init
