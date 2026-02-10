@@ -5,20 +5,44 @@
 #   - an attempt at an arbitrary addon justfile template 
 #   - created to replace custom .sh scripts with a single justfile.
 #   - set the variables at the top or on the fly with --set $var_name $foo
-# Author: Jeremy-Gstein
+# Features:
+#   - list, remove, sync, and run commen git commands for WoW addon projects
+#   - integrated with bigwigs/packager for easy tagged releases
+# Example:
+#   - `just ls retail` - List all files in the addons folder for retail WoW 
+#   - `just build 1.0.3 "New: some comment here"` - Runs git add, git commit, and git tag to trigger a CI release build.
+#   - `just help` - print all available commands
+# Author: Jeremy-Gstein - jeremy51b5@pm.me
 
 ###############################
 # CONFIGURE PROJECT VARIABLES #
 ###############################
 # Specify name of addon
 addon_name := "AccountPlayed"
-# DEFAULT PATHS 
-retail_path := "/home/jg/Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/_retail_/Interface/AddOns"
-beta_path := "/home/jg/Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/_beta_/Interface/AddOns"
-classic_path := "/home/jg/Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/_classic_era_/Interface/AddOns"
+
+# DEFAULT PATHS - Set based on the OS family
+os := os_family()
+
+retail_path := if os == "unix" { 
+  "/home/$USER/Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/_retail_/Interface/AddOns" 
+} else { 
+  "C:\\Program Files (x86)\\World of Warcraft\\_retail_\\Interface\\AddOns" 
+}
+
+beta_path := if os == "unix" { 
+  "/home/$USER/Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/_beta_/Interface/AddOns" 
+} else { 
+  "C:\\Program Files (x86)\\World of Warcraft\\_beta_\\Interface\\AddOns" 
+}
+
+classic_path := if os == "unix" { 
+  "/home/$USER/Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/_classic_era_/Interface/AddOns" 
+} else { 
+  "C:\\Program Files (x86)\\World of Warcraft\\_classic_era_\\Interface\\AddOns" 
+}
 
 # ADDON FILES (.lua .toc etc..)
-files := "AccountPlayed.lua MinimapButton.lua AccountPlayed.toc"
+files := "*.lua *.toc"
 
 # just list available commands B)
 _default:
@@ -62,10 +86,14 @@ rm-retail:
 rm-classic:
   @just rm classic
 
-
-
 rm target:
-  rm -rf "{{ if target == "beta" { beta_path } else if target == "classic" { classic_path } else { retail_path } }}/{{ addon_name }}"
+  rm -rf "{{ if target == "beta" { 
+    beta_path 
+  } else if target == "classic" { 
+    classic_path 
+  } else { 
+    retail_path 
+  } }}/{{ addon_name }}"
 
 # list beta dir with changes 
 ls-beta:
@@ -83,7 +111,7 @@ ls-classic:
 ls target:
   ls -larth "{{ if target == "beta" { beta_path } else if target == "classic" { classic_path } else { retail_path } }}/{{ addon_name }}"
 
-# git ci for packager
+# git ci for bigwigs/packager (gh action)
 # example: just build 1.0.0 "some message here"
 build tag message:
   git commit -am "Release: v{{tag}} - {{message}}"
