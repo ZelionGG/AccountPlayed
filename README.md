@@ -17,7 +17,8 @@ Features:
 
 Usage:
 - `/apclasswin` - open/close account played window (OR use minimap button)
-- `/apdebug` - prints a list of all stored characters to chat in the following format: `Realm-Name: TimePlayed (CLASS)`
+- `/apdebug`    - prints a list of all stored characters to chat in the following format: `Realm-Name: TimePlayed (CLASS)`
+- `/apresetmap` - reset the position of minimap button to bottom left of minimap  
 
 ### Quick-start:
 - Download the latest release here on github. extract the zip to your games addon folder.
