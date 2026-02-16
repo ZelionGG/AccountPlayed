@@ -9,11 +9,11 @@ Features:
 - View your accounts top played time by class
 - sorted by (class/total account /played) as a percentage
 - small popup ui (resize, drag, move, and scroll as you please!)
-- minimap button to toggle ui.
+- minimap button to toggle ui (fades when mouse is not over minimap).
 - (NEW) Hover over classes to get a popup of all characters making up the playtime.
 - (NEW) Button to Toggle between Years/Days or Hours/Min
 - (NEW) Press escape to close window
-- (Planned/Incomplete) Localized strings to support other languages. 
+- (NEW/Work-in-Progress) Localized framework currently supporting enUS, zhCN, zhTW 
 
 Usage:
 - `/apclasswin` - open/close account played window (OR use minimap button)
@@ -47,6 +47,7 @@ just build 1.0.0 "Commit Message for Tagged release"
 HUGE Thank you to everyone in [Seems Good](https://seemsgood.org) for testing and motivating to publish and share with others.
 - Pip: Original idea to share time played and compare with other guildies.
 - Whare: WoW api help and debugging
-- Amadeus: Minimap fix to support all ui layouts, padding with class names, and better fomatting
+- [Amadeus](https://github.com/Amadeus-): Minimap fix to support all ui layouts, padding with class names, and better fomatting
+- [SGSwdzgr](https://github.com/SGSwdzgr): Added Localizatin Support for Simplified Chinese (zhCN) and Traditional Chinese (zhTW) and English (enUS)
 - [WOWHEAD](https://www.wowhead.com/news/find-your-favorite-class-with-account-played-380300) - Huge thanks for promoting the addon!! seeing all the screenshots shared online is surreal to say the least.
 - [r/wow](https://www.reddit.com/r/wow/comments/1quo3h0/account_played_track_and_display_your_characters/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button) - All the great feedback like missing documentation on slashcommands, bugs with missing minimap, and screenshots shared (:
