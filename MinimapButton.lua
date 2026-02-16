@@ -52,7 +52,7 @@ local function UpdateButtonPosition(button)
     button:SetPoint("CENTER", Minimap, "CENTER", x, y)
 end
 
--- OPTIMIZED: Fade animation using Blizzard's built-in system
+-- Fade animation using Blizzard's built-in system
 local function FadeButton(btn, targetAlpha, duration)
     duration = duration or 0.15
     
@@ -123,7 +123,7 @@ local function CreateMinimapButton()
         GameTooltip:Hide()
         
         -- Only fade if we're leaving both the button AND the minimap area
-        if self.snapped and not self.hoverDetector:IsMouseOver() then
+        if self.snapped and not Minimap:IsMouseOver() then
             FadeButton(self, 0.01, 0.15)
         end
     end)
@@ -146,30 +146,19 @@ local function CreateMinimapButton()
         end
     end)
 
-    -- OPTIMIZED: Event-driven hover detection instead of continuous polling
-    -- This replaces the old OnUpdate handler that ran 5x per second
-    local hoverDetector = CreateFrame("Frame", nil, Minimap)
-    -- Add padding around minimap so button doesn't fade when mouse is near edge
-    local HOVER_PADDING = 120  -- Pixels of padding around minimap (increase if button fades too quickly)
-    hoverDetector:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -HOVER_PADDING, HOVER_PADDING)
-    hoverDetector:SetPoint("BOTTOMRIGHT", Minimap, "BOTTOMRIGHT", HOVER_PADDING, -HOVER_PADDING)
-    hoverDetector:EnableMouse(false)  -- Don't block clicks
-    hoverDetector:SetFrameStrata("LOW")
-    
-    hoverDetector:SetScript("OnEnter", function()
+    -- Hook Minimap's own mouse events instead of creating blocking overlay
+    Minimap:HookScript("OnEnter", function()
         if not btn.isDragging and btn.snapped then
             FadeButton(btn, 1, 0.15)
         end
     end)
     
-    hoverDetector:SetScript("OnLeave", function()
+    Minimap:HookScript("OnLeave", function()
         -- Only fade out if mouse is not over the button itself
         if not btn.isDragging and btn.snapped and not btn:IsMouseOver() then
             FadeButton(btn, 0.01, 0.15)
         end
     end)
-    
-    btn.hoverDetector = hoverDetector
 
     -- Border (OVERLAY, positioned first)
     btn.border = btn:CreateTexture(nil, "OVERLAY")
@@ -187,7 +176,7 @@ local function CreateMinimapButton()
     -- Highlight
     btn:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight", "ADD")
 
-    -- OPTIMIZED: Drag handlers with cached values
+    -- Drag handlers with cached values
     btn:SetScript("OnDragStart", function(self)
         if AccountPlayedMinimapDB.locked then
             print("|cff00ff00Account Played:|r " .. L["MSG_BUTTON_LOCKED"])
@@ -196,7 +185,7 @@ local function CreateMinimapButton()
         
         self.isDragging = true
         
-        -- OPTIMIZATION: Cache values that don't change during drag
+        -- Cache values that don't change during drag
         local minimap = Minimap
         local minimapScale = minimap:GetEffectiveScale()
         local minimapCenterX, minimapCenterY = minimap:GetCenter()
@@ -215,7 +204,7 @@ local function CreateMinimapButton()
             cx, cy = cx / minimapScale, cy / minimapScale
             local dx, dy = cx - minimapCenterX, cy - minimapCenterY
             
-            -- OPTIMIZATION: Use squared distance when possible (avoids sqrt)
+            -- Use squared distance when possible (avoids sqrt)
             local distSquared = dx * dx + dy * dy
             local dist = distSquared ^ 0.5  -- Only calc actual distance once
             
@@ -261,7 +250,7 @@ local function CreateMinimapButton()
         end
     end)
 
-    -- OPTIMIZATION: Cleanup on hide
+    --  Cleanup on hide
     btn:HookScript("OnHide", function(self)
         -- Cancel any running fades
         UIFrameFadeRemoveFrame(self)
