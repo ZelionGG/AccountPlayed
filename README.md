@@ -24,6 +24,15 @@ Usage:
 - Download the latest release here on github. extract the zip to your games addon folder.
 - (Recommended) Download with your favorite addon manager via [Curse](https://www.curseforge.com/wow/addons/account-played)
 
+### Honorable Mentions:
+HUGE Thank you to everyone in [Seems Good](https://seemsgood.org) for testing and motivating to publish and share with others.
+- Pip: Original idea to share time played and compare with other guildies.
+- Whare: WoW api help and debugging
+- [Amadeus](https://github.com/Amadeus-): Minimap fix to support all ui layouts, padding with class names, and better fomatting
+- [SGSwdzgr](https://github.com/SGSwdzgr): Added Localizatin Support for Simplified Chinese (zhCN) and Traditional Chinese (zhTW) and English (enUS)
+- [WOWHEAD](https://www.wowhead.com/news/find-your-favorite-class-with-account-played-380300) - Huge thanks for promoting the addon!! seeing all the screenshots shared online is surreal to say the least.
+- [r/wow](https://www.reddit.com/r/wow/comments/1quo3h0/account_played_track_and_display_your_characters/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button) - All the great feedback like missing documentation on slashcommands, bugs with missing minimap, and screenshots shared (:
+
 ### Contributing:
 - install `just` to run the repos `justfile` 
 - set PATHs to match local at the top of `justfile`
@@ -42,12 +51,3 @@ Generate a Tagged Release to trigger ./.github/workflows/build.yml (packager act
 # just build <tag> <commit>
 just build 1.0.0 "Commit Message for Tagged release"
 ```
-
-### Honorable Mentions:
-HUGE Thank you to everyone in [Seems Good](https://seemsgood.org) for testing and motivating to publish and share with others.
-- Pip: Original idea to share time played and compare with other guildies.
-- Whare: WoW api help and debugging
-- [Amadeus](https://github.com/Amadeus-): Minimap fix to support all ui layouts, padding with class names, and better fomatting
-- [SGSwdzgr](https://github.com/SGSwdzgr): Added Localizatin Support for Simplified Chinese (zhCN) and Traditional Chinese (zhTW) and English (enUS)
-- [WOWHEAD](https://www.wowhead.com/news/find-your-favorite-class-with-account-played-380300) - Huge thanks for promoting the addon!! seeing all the screenshots shared online is surreal to say the least.
-- [r/wow](https://www.reddit.com/r/wow/comments/1quo3h0/account_played_track_and_display_your_characters/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button) - All the great feedback like missing documentation on slashcommands, bugs with missing minimap, and screenshots shared (:
