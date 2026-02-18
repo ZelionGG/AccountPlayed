@@ -37,15 +37,16 @@ L["TIME_UNIT_HOUR"] = "h"
 L["TIME_UNIT_MINUTE"] = "m"
 
 -- Delete command strings
-L["CMD_DELETE_USAGE"]     = "Usage: /apdelete CharName-RealmName"
-L["CMD_DELETE_SUCCESS"]   = "Account Played: Removed '%s' from the database."
-L["CMD_DELETE_NOT_FOUND"] = "Account Played: Character '%s' not found in the database."
-L["CMD_DELETE_CONFIRM"]   = "Are you sure you want to remove |cffffff00%s|r from Account Played?"
+L["CMD_DELETE_USAGE"]     = "Usage: /apdelete CharName-RealmName" -- (AI-GENERATED TRANSLATION)
+L["CMD_DELETE_SUCCESS"]   = "Account Played: Removed '%s' from the database." -- (AI-GENERATED TRANSLATION)
+L["CMD_DELETE_NOT_FOUND"] = "Account Played: Character '%s' not found in the database." -- (AI-GENERATED TRANSLATION)
+L["CMD_DELETE_CONFIRM"]   = "Are you sure you want to remove |cffffff00%s|r from Account Played?" -- (AI-GENERATED TRANSLATION)
+
 
 -- Character management panel strings
-L["CHAR_PANEL_RIGHT_CLICK"] = "Right-click to manage characters"
-L["CHAR_PANEL_REMOVE_TIP"]  = "Remove from Account Played"
-L["CLICK_TO_PRINT"] = "Left-Click to print in chat"
+L["CHAR_PANEL_RIGHT_CLICK"] = "Right-Click to manage characters" -- (AI-GENERATED TRANSLATION)
+L["CHAR_PANEL_REMOVE_TIP"]  = "Remove from Account Played" -- (AI-GENERATED TRANSLATION)
+L["CLICK_TO_PRINT"] = "Left-Click to print in chat" -- (AI-GENERATED TRANSLATION)
 
 
 if GetLocale() == "zhCN" then
@@ -128,12 +129,12 @@ if GetLocale() == "zhTW" then
     L["TIME_UNIT_MINUTE"] = "分鐘"
 
     -- Delete command strings
-    L["CMD_DELETE_USAGE"]     = "用法: /apdelete 角色名-伺服器名"
-    L["CMD_DELETE_SUCCESS"]   = "Account Played: 已從資料庫中移除 '%s'。"
-    L["CMD_DELETE_NOT_FOUND"] = "Account Played: 資料庫中未找到角色 '%s'。"
-    L["CMD_DELETE_CONFIRM"]   = "確定要從 Account Played 中移除 |cffffff00%s|r 嗎？"
+    L["CMD_DELETE_USAGE"]     = "用法: /apdelete 角色名-伺服器名" -- (AI-GENERATED TRANSLATION)
+    L["CMD_DELETE_SUCCESS"]   = "Account Played: 已從資料庫中移除 '%s'。" -- (AI-GENERATED TRANSLATION)
+    L["CMD_DELETE_NOT_FOUND"] = "Account Played: 資料庫中未找到角色 '%s'。" -- (AI-GENERATED TRANSLATION)
+    L["CMD_DELETE_CONFIRM"]   = "確定要從 Account Played 中移除 |cffffff00%s|r 嗎？" -- (AI-GENERATED TRANSLATION)
 
     -- Character management panel strings
-    L["CHAR_PANEL_RIGHT_CLICK"] = "右鍵點擊管理角色"
-    L["CHAR_PANEL_REMOVE_TIP"]  = "從 Account Played 中移除"
+    L["CHAR_PANEL_RIGHT_CLICK"] = "右鍵點擊管理角色" -- (AI-GENERATED TRANSLATION)
+    L["CHAR_PANEL_REMOVE_TIP"]  = "從 Account Played 中移除" -- (AI-GENERATED TRANSLATION)
 end
