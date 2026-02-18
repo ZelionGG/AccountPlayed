@@ -186,6 +186,79 @@ SLASH_ACCOUNTPLAYEDDEBUG1 = "/apdebug"
 SlashCmdList.ACCOUNTPLAYEDDEBUG = DebugListCharacters
 
 --------------------------------------------------
+-- Delete Character Command
+--------------------------------------------------
+
+-- Confirmation dialog (uses the game's own DELETE / CANCEL globals so every
+-- client locale gets properly translated button labels for free).
+StaticPopupDialogs["ACCOUNTPLAYED_CONFIRM_DELETE"] = {
+    -- %s is replaced by the DB key (e.g. "Area52-Thrall") at show-time.
+    text          = "",          -- overwritten dynamically; see DeleteCharacter below
+    button1       = DELETE,      -- game global: "Delete" / "删除" / etc.
+    button2       = CANCEL,      -- game global: "Cancel" / "取消" / etc.
+    OnAccept      = function(self, data)
+        if not data or not data.foundKey then return end
+        AccountPlayedDB[data.foundKey] = nil
+        print("|cff00ff00" .. string.format(L["CMD_DELETE_SUCCESS"], data.foundKey) .. "|r")
+        if AP.popupFrame and AP.popupFrame:IsShown() then
+            AP.popupFrame:UpdateDisplay()
+        end
+    end,
+    timeout       = 0,
+    whileDead     = true,
+    hideOnEscape  = true,
+    preferredIndex = 3,
+}
+
+-- Accepts "CharName-RealmName" (armory-style).
+-- The DB stores keys as "RealmName-CharName", so we flip the two parts.
+-- Splitting on the FIRST hyphen handles realm names that themselves contain
+-- hyphens (e.g. "Azjol-Nerub"): everything after the first "-" is the realm.
+-- Matching is case-insensitive so players don't have to nail the exact casing.
+local function DeleteCharacter(input)
+    input = input and input:match("^%s*(.-)%s*$") or ""  -- trim whitespace
+
+    if input == "" then
+        print("|cffff9900" .. L["CMD_DELETE_USAGE"] .. "|r")
+        return
+    end
+
+    -- Split "CharName-RealmName" on the first hyphen
+    local charName, realmName = input:match("^([^%-]+)%-(.+)$")
+    if not charName or not realmName then
+        print("|cffff9900" .. L["CMD_DELETE_USAGE"] .. "|r")
+        return
+    end
+
+    -- Rebuild in the DB's "Realm-Name" order
+    local targetKey = realmName .. "-" .. charName
+
+    -- Case-insensitive search so players don't have to worry about capitalisation
+    local foundKey = nil
+    local lowerTarget = targetKey:lower()
+    for dbKey in pairs(AccountPlayedDB) do
+        if dbKey:lower() == lowerTarget then
+            foundKey = dbKey
+            break
+        end
+    end
+
+    if not foundKey then
+        print("|cffff0000" .. string.format(L["CMD_DELETE_NOT_FOUND"], input) .. "|r")
+        return
+    end
+
+    -- Populate the dialog text with the located key, then show it.
+    StaticPopupDialogs["ACCOUNTPLAYED_CONFIRM_DELETE"].text =
+        string.format(L["CMD_DELETE_CONFIRM"], foundKey)
+
+    StaticPopup_Show("ACCOUNTPLAYED_CONFIRM_DELETE", nil, nil, { foundKey = foundKey })
+end
+
+SLASH_ACCOUNTPLAYEDDELETE1 = "/apdelete"
+SlashCmdList.ACCOUNTPLAYEDDELETE = DeleteCharacter
+
+--------------------------------------------------
 -- UI Components
 --------------------------------------------------
 

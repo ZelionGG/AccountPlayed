@@ -37,6 +37,12 @@ L["TIME_UNIT_DAY"] = "d"
 L["TIME_UNIT_HOUR"] = "h"
 L["TIME_UNIT_MINUTE"] = "m"
 
+-- Delete command strings
+L["CMD_DELETE_USAGE"]     = "Usage: /apdelete CharName-RealmName"
+L["CMD_DELETE_SUCCESS"]   = "Account Played: Removed '%s' from the database."
+L["CMD_DELETE_NOT_FOUND"] = "Account Played: Character '%s' not found in the database."
+L["CMD_DELETE_CONFIRM"]   = "Are you sure you want to remove |cffffff00%s|r from Account Played?"
+
 if GetLocale() == "zhCN" then
     L["ADDON_NAME"] = "账号游戏时间"
     L["WINDOW_TITLE"] = "账号游戏时间 - 按职业统计"
@@ -70,6 +76,12 @@ if GetLocale() == "zhCN" then
     L["TIME_UNIT_DAY"] = "天"
     L["TIME_UNIT_HOUR"] = "小时"
     L["TIME_UNIT_MINUTE"] = "分钟"
+
+    -- Delete command strings
+    L["CMD_DELETE_USAGE"]     = "用法: /apdelete 角色名-服务器名"
+    L["CMD_DELETE_SUCCESS"]   = "Account Played: 已从数据库中移除 '%s'。"
+    L["CMD_DELETE_NOT_FOUND"] = "Account Played: 数据库中未找到角色 '%s'。"
+    L["CMD_DELETE_CONFIRM"]   = "确定要从 Account Played 中移除 |cffffff00%s|r 吗？"
 end
 
 if GetLocale() == "zhTW" then
@@ -105,4 +117,10 @@ if GetLocale() == "zhTW" then
     L["TIME_UNIT_DAY"] = "天"
     L["TIME_UNIT_HOUR"] = "小時"
     L["TIME_UNIT_MINUTE"] = "分鐘"
+
+    -- Delete command strings
+    L["CMD_DELETE_USAGE"]     = "用法: /apdelete 角色名-伺服器名"
+    L["CMD_DELETE_SUCCESS"]   = "Account Played: 已從資料庫中移除 '%s'。"
+    L["CMD_DELETE_NOT_FOUND"] = "Account Played: 資料庫中未找到角色 '%s'。"
+    L["CMD_DELETE_CONFIRM"]   = "確定要從 Account Played 中移除 |cffffff00%s|r 嗎？"
 end
