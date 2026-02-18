@@ -9,7 +9,6 @@ L["NO_DATA"] = "No data yet"
 L["TOTAL"] = "TOTAL: "
 L["DEBUG_HEADER"] = "[AccountPlayed Debug] Known characters:"
 L["DB_CORRUPTED"] = "Account Played: SavedVariables corrupted, resetting!"
-L["CLICK_TO_PRINT"] = "Click to print in chat"
 L["USE_YEARS_LABEL"] = "Years"
 L["TIME_FORMAT_TITLE"] = "Time Format"
 L["TIME_FORMAT_YEARS"] = "Checked: Years/Days"
@@ -42,6 +41,12 @@ L["CMD_DELETE_USAGE"]     = "Usage: /apdelete CharName-RealmName"
 L["CMD_DELETE_SUCCESS"]   = "Account Played: Removed '%s' from the database."
 L["CMD_DELETE_NOT_FOUND"] = "Account Played: Character '%s' not found in the database."
 L["CMD_DELETE_CONFIRM"]   = "Are you sure you want to remove |cffffff00%s|r from Account Played?"
+
+-- Character management panel strings
+L["CHAR_PANEL_RIGHT_CLICK"] = "Right-click to manage characters"
+L["CHAR_PANEL_REMOVE_TIP"]  = "Remove from Account Played"
+L["CLICK_TO_PRINT"] = "Left-Click to print in chat"
+
 
 if GetLocale() == "zhCN" then
     L["ADDON_NAME"] = "账号游戏时间"
@@ -82,6 +87,10 @@ if GetLocale() == "zhCN" then
     L["CMD_DELETE_SUCCESS"]   = "Account Played: 已从数据库中移除 '%s'。"
     L["CMD_DELETE_NOT_FOUND"] = "Account Played: 数据库中未找到角色 '%s'。"
     L["CMD_DELETE_CONFIRM"]   = "确定要从 Account Played 中移除 |cffffff00%s|r 吗？"
+
+    -- Character management panel strings
+    L["CHAR_PANEL_RIGHT_CLICK"] = "右键点击管理角色"
+    L["CHAR_PANEL_REMOVE_TIP"]  = "从 Account Played 中移除"
 end
 
 if GetLocale() == "zhTW" then
@@ -123,4 +132,8 @@ if GetLocale() == "zhTW" then
     L["CMD_DELETE_SUCCESS"]   = "Account Played: 已從資料庫中移除 '%s'。"
     L["CMD_DELETE_NOT_FOUND"] = "Account Played: 資料庫中未找到角色 '%s'。"
     L["CMD_DELETE_CONFIRM"]   = "確定要從 Account Played 中移除 |cffffff00%s|r 嗎？"
+
+    -- Character management panel strings
+    L["CHAR_PANEL_RIGHT_CLICK"] = "右鍵點擊管理角色"
+    L["CHAR_PANEL_REMOVE_TIP"]  = "從 Account Played 中移除"
 end

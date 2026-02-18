@@ -210,6 +210,14 @@ StaticPopupDialogs["ACCOUNTPLAYED_CONFIRM_DELETE"] = {
     preferredIndex = 3,
 }
 
+-- Shared helper: show the confirm dialog for a known DB key.
+-- Called by both the slash command and the GUI trash buttons.
+local function ConfirmDeleteKey(foundKey)
+    StaticPopupDialogs["ACCOUNTPLAYED_CONFIRM_DELETE"].text =
+        string.format(L["CMD_DELETE_CONFIRM"], foundKey)
+    StaticPopup_Show("ACCOUNTPLAYED_CONFIRM_DELETE", nil, nil, { foundKey = foundKey })
+end
+
 -- Accepts "CharName-RealmName" (armory-style).
 -- The DB stores keys as "RealmName-CharName", so we flip the two parts.
 -- Splitting on the FIRST hyphen handles realm names that themselves contain
@@ -248,15 +256,200 @@ local function DeleteCharacter(input)
         return
     end
 
-    -- Populate the dialog text with the located key, then show it.
-    StaticPopupDialogs["ACCOUNTPLAYED_CONFIRM_DELETE"].text =
-        string.format(L["CMD_DELETE_CONFIRM"], foundKey)
-
-    StaticPopup_Show("ACCOUNTPLAYED_CONFIRM_DELETE", nil, nil, { foundKey = foundKey })
+    ConfirmDeleteKey(foundKey)
 end
 
 SLASH_ACCOUNTPLAYEDDELETE1 = "/apdelete"
 SlashCmdList.ACCOUNTPLAYEDDELETE = DeleteCharacter
+
+--------------------------------------------------
+-- Character Management Panel
+-- A pinned flyout that anchors to the right of the
+-- main popup, showing each character with a trash btn.
+--------------------------------------------------
+
+AP.charPanelClass = nil   -- which class is currently pinned
+
+local CPANEL_W        = 230
+local CPANEL_ROW_H    = 22
+local CPANEL_HEADER_H = 28
+local CPANEL_PAD      = 6
+
+local function CreateCharPanel()
+    if AP.charPanel then return AP.charPanel end
+
+    local p = CreateFrame("Frame", "AccountPlayedCharPanel", UIParent, "BackdropTemplate")
+    p:SetWidth(CPANEL_W)
+    p:SetHeight(CPANEL_HEADER_H + CPANEL_PAD)
+    p:SetFrameStrata("DIALOG")
+    p:SetFrameLevel(110)
+    p:SetClampedToScreen(true)
+
+    p:SetBackdrop({
+        bgFile   = "Interface\\ChatFrame\\ChatFrameBackground",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tile = true, tileSize = 32, edgeSize = 24,
+        insets = { left = 8, right = 8, top = 8, bottom = 8 },
+    })
+    p:SetBackdropColor(0.05, 0.05, 0.05, 0.92)
+
+    -- Class name title
+    p.titleText = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    p.titleText:SetPoint("TOPLEFT",  p, "TOPLEFT",  12, -10)
+    p.titleText:SetPoint("TOPRIGHT", p, "TOPRIGHT", -26, -10)
+    p.titleText:SetJustifyH("LEFT")
+
+    -- Close button (uses WoW's native styled button)
+    local closeBtn = CreateFrame("Button", nil, p, "UIPanelCloseButton")
+    closeBtn:SetSize(20, 20)
+    closeBtn:SetPoint("TOPRIGHT", p, "TOPRIGHT", -2, -2)
+    closeBtn:SetScript("OnClick", function()
+        p:Hide()
+        AP.charPanelClass = nil
+    end)
+
+    -- Divider
+    local div = p:CreateTexture(nil, "ARTWORK")
+    div:SetHeight(1)
+    div:SetPoint("TOPLEFT",  p, "TOPLEFT",  10, -(CPANEL_HEADER_H - 2))
+    div:SetPoint("TOPRIGHT", p, "TOPRIGHT", -10, -(CPANEL_HEADER_H - 2))
+    div:SetColorTexture(0.4, 0.4, 0.4, 0.8)
+
+    -- Reusable character rows (pool of 20)
+    p.charRows = {}
+    for i = 1, 20 do
+        local yOff = -(CPANEL_HEADER_H + CPANEL_PAD + (i - 1) * CPANEL_ROW_H)
+        local row  = CreateFrame("Frame", nil, p)
+        row:SetHeight(CPANEL_ROW_H)
+        row:SetPoint("TOPLEFT",  p, "TOPLEFT",  10, yOff)
+        row:SetPoint("TOPRIGHT", p, "TOPRIGHT", -10, yOff)
+
+        -- Subtle hover glow (revealed by trash btn hover)
+        row.bg = row:CreateTexture(nil, "BACKGROUND")
+        row.bg:SetAllPoints()
+        row.bg:SetColorTexture(1, 1, 1, 0)
+
+        -- Character name
+        row.nameText = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        row.nameText:SetPoint("LEFT", row, "LEFT", 0, 0)
+        row.nameText:SetPoint("RIGHT", row, "RIGHT", -110, 0)
+        row.nameText:SetJustifyH("LEFT")
+        row.nameText:SetWordWrap(false)
+
+        -- Play time (sits between name and delete button)
+        row.timeText = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        row.timeText:SetPoint("RIGHT", row, "RIGHT", -52, 0)
+        row.timeText:SetWidth(72)
+        row.timeText:SetJustifyH("RIGHT")
+        row.timeText:SetTextColor(0.75, 0.75, 0.75)
+
+        -- Delete button
+        local trashBtn = CreateFrame("Button", nil, row)
+        trashBtn:SetSize(44, 18)
+        trashBtn:SetPoint("RIGHT", row, "RIGHT", 0, 0)
+
+        local trashLabel = trashBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        trashLabel:SetAllPoints()
+        trashLabel:SetText("|cffff4040" .. DELETE .. "|r")
+        trashLabel:SetJustifyH("CENTER")
+
+        -- Size the button to fit the DELETE text width
+        trashBtn:SetWidth(trashLabel:GetStringWidth() + 8)
+
+        trashBtn:SetScript("OnEnter", function()
+            row.bg:SetColorTexture(1, 0.25, 0.25, 0.15)
+            GameTooltip:SetOwner(trashBtn, "ANCHOR_RIGHT")
+            GameTooltip:SetText(L["CHAR_PANEL_REMOVE_TIP"], 1, 0.35, 0.35)
+            GameTooltip:Show()
+        end)
+        trashBtn:SetScript("OnLeave", function()
+            row.bg:SetColorTexture(1, 1, 1, 0)
+            GameTooltip:Hide()
+        end)
+        trashBtn:SetScript("OnClick", function()
+            if row.charKey then
+                ConfirmDeleteKey(row.charKey)
+            end
+        end)
+
+        row.trashBtn = trashBtn
+        row:Hide()
+        p.charRows[i] = row
+    end
+
+    p:Hide()
+    AP.charPanel = p
+
+    -- Register so Escape closes the panel (same as any standard WoW window)
+    table.insert(UISpecialFrames, "AccountPlayedCharPanel")
+
+    return p
+end
+
+-- Show (or toggle off) the character panel for the given class.
+-- anchorRow : the class row frame to anchor next to (where the tooltip was).
+--             Omit when forceShow=true (panel keeps its current position).
+-- forceShow : repopulate without toggling (used by UpdateDisplay after a delete).
+function AP.ShowCharPanel(className, forceShow, anchorRow)
+    local p = CreateCharPanel()
+
+    -- Toggle off when right-clicking the same class a second time
+    if not forceShow and AP.charPanelClass == className and p:IsShown() then
+        p:Hide()
+        AP.charPanelClass = nil
+        return
+    end
+
+    local chars = GetCharactersByClass(className)
+    if #chars == 0 then
+        p:Hide()
+        AP.charPanelClass = nil
+        return
+    end
+
+    AP.charPanelClass = className
+
+    -- Re-anchor only when we have a fresh row reference (i.e. not a forced
+    -- repopulate after a delete, where the panel is already in the right place).
+    if anchorRow then
+        p:ClearAllPoints()
+        p:SetPoint("TOPLEFT", anchorRow, "TOPRIGHT", 6, 0)
+    elseif not p:IsShown() then
+        -- Fallback: anchor to the main popup's right edge if no row given
+        p:ClearAllPoints()
+        if AP.popupFrame and AP.popupFrame:IsShown() then
+            p:SetPoint("TOPLEFT", AP.popupFrame, "TOPRIGHT", 4, 0)
+        else
+            p:SetPoint("CENTER")
+        end
+    end
+
+    -- Title (class-coloured)
+    local color = RAID_CLASS_COLORS[className] or { r = 1, g = 1, b = 1 }
+    p.titleText:SetText(GetLocalizedClass(className))
+    p.titleText:SetTextColor(color.r, color.g, color.b)
+
+    -- Populate rows
+    for i, row in ipairs(p.charRows) do
+        local char = chars[i]
+        if char then
+            local name    = char.key:match("%-(.+)$") or char.key
+            local timeStr = FormatTimeDetailed(char.time, AccountPlayedPopupDB.useYears)
+            row.nameText:SetText(name)
+            row.nameText:SetTextColor(color.r, color.g, color.b)
+            row.timeText:SetText(timeStr)
+            row.charKey = char.key
+            row:Show()
+        else
+            row.charKey = nil
+            row:Hide()
+        end
+    end
+
+    -- Resize to fit the number of characters
+    p:SetHeight(CPANEL_HEADER_H + CPANEL_PAD + #chars * CPANEL_ROW_H + CPANEL_PAD)
+    p:Show()
+end
 
 --------------------------------------------------
 -- UI Components
@@ -266,7 +459,7 @@ local function CreateRow(parent, width, height)
     local row = CreateFrame("Button", nil, parent)
     row:SetSize(width, height)
     row:EnableMouse(true)
-    row:RegisterForClicks("LeftButtonUp")
+    row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
     row.highlight = row:CreateTexture(nil, "BACKGROUND")
     row.highlight:SetAllPoints()
@@ -311,7 +504,8 @@ local function CreateRow(parent, width, height)
                     GameTooltip:AddDoubleLine(name, timeStr, color.r, color.g, color.b, 1, 1, 1)
                 end
                 GameTooltip:AddLine(" ")
-                GameTooltip:AddLine(L["CLICK_TO_PRINT"], 0.5, 0.5, 0.5)
+                GameTooltip:AddLine(L["CLICK_TO_PRINT"],       0.5, 0.5, 0.5)
+                GameTooltip:AddLine(L["CHAR_PANEL_RIGHT_CLICK"], 0.5, 0.5, 0.5)
                 GameTooltip:Show()
             end
         end
@@ -322,8 +516,18 @@ local function CreateRow(parent, width, height)
         GameTooltip:Hide()
     end)
 
-    row:SetScript("OnClick", function(self)
-        if self.className then
+    row:SetScript("OnClick", function(self, button)
+        if not self.className then return end
+
+        if button == "RightButton" then
+            -- Hide the hover tooltip — the panel takes its place
+            GameTooltip:Hide()
+            PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
+            -- Pass self so the panel anchors right next to this row
+            AP.ShowCharPanel(self.className, false, self)
+
+        else
+            -- Left-click: print class breakdown to chat (existing behaviour)
             local chars = GetCharactersByClass(self.className)
             if #chars > 0 then
                 PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON)
@@ -333,7 +537,7 @@ local function CreateRow(parent, width, height)
                     local name = char.key:match("%-(.+)$") or char.key
                     local timeStr = FormatTimeDetailed(char.time, AccountPlayedPopupDB.useYears)
                     local color = RAID_CLASS_COLORS[char.class] or { r = 1, g = 1, b = 1 }
-                    print(string.format("  |cff%02x%02x%02x%s|r - %s", 
+                    print(string.format("  |cff%02x%02x%02x%s|r - %s",
                         color.r * 255, color.g * 255, color.b * 255, name, timeStr))
                 end
             end
@@ -430,10 +634,17 @@ local function CreatePopup()
     close:SetPoint("TOPRIGHT", -10, -10)
     close:SetScript("OnClick", function()
         PlaySound(SOUNDKIT.IG_MAINMENU_CLOSE)
-        f:Hide()
+        f:Hide()  -- OnHide handles charPanel cleanup
     end)
     
     table.insert(UISpecialFrames, "AccountPlayedPopup")
+
+    -- Close the char panel whenever this window hides for ANY reason
+    -- (X button, Escape key, /apclasswin toggle, etc.)
+    f:SetScript("OnHide", function()
+        if AP.charPanel then AP.charPanel:Hide() end
+        AP.charPanelClass = nil
+    end)
 
     -- ScrollFrame
     local scrollFrame = CreateFrame("ScrollFrame", nil, f, "UIPanelScrollFrameTemplate")
@@ -562,6 +773,12 @@ local function CreatePopup()
         self.content:SetHeight(#sorted * 22)
         UpdateScrollBarVisibility(self)
         self.totalRow:SetText(L["TOTAL"] .. FormatTimeTotal(accountTotal, AccountPlayedPopupDB.useYears))
+
+        -- If the character panel is pinned open, repopulate it in place so
+        -- deleted entries vanish immediately without the user having to re-open.
+        if AP.charPanel and AP.charPanel:IsShown() and AP.charPanelClass then
+            AP.ShowCharPanel(AP.charPanelClass, true)  -- forceShow = no toggle
+        end
     end
 
     f:Hide()
